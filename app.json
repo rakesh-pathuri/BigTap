@@ -23,20 +23,20 @@
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
         {
-          "action": "android.intent.action.MAIN",
+          "action": "MAIN",
           "category": [
-            "android.intent.category.HOME",
-            "android.intent.category.DEFAULT"
+            "HOME",
+            "DEFAULT"
           ]
         },
         {
-          "action": "android.intent.action.VIEW",
+          "action": "VIEW",
           "data": {
             "scheme": "tel"
           }
         },
         {
-          "action": "android.intent.action.VIEW",
+          "action": "VIEW",
           "data": {
             "scheme": "sms"
           }
