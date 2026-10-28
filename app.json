@@ -56,6 +56,12 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "01f6707b-44ee-42ff-94c8-ea393373c93f"
+      }
+    },
+    "owner": "rakesh_p"
   }
 }
