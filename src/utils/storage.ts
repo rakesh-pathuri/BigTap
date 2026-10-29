@@ -1,20 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { INITIAL_QUICK_APPS, INITIAL_SETTINGS } from '../constants/initialData';
+import { INITIAL_CONTACTS, INITIAL_QUICK_APPS, INITIAL_SETTINGS } from '../constants/initialData';
 import { LauncherSettings, QuickAppItem, SpeedContact } from '../types';
 
-const CONTACTS_KEY = '@ease_contacts_v2';
-const APPS_KEY = '@ease_apps_v4';
-const SETTINGS_KEY = '@ease_settings_v2';
+const CONTACTS_KEY = '@bigtap_contacts_v1';
+const APPS_KEY = '@bigtap_apps_v1';
+const SETTINGS_KEY = '@bigtap_settings_v1';
 
 export const loadStoredContacts = async (): Promise<SpeedContact[]> => {
   try {
     const raw = await AsyncStorage.getItem(CONTACTS_KEY);
-    if (!raw) return [];
+    if (!raw) return INITIAL_CONTACTS;
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : INITIAL_CONTACTS;
   } catch (err) {
     console.warn('Failed to load contacts from storage:', err);
-    return [];
+    return INITIAL_CONTACTS;
   }
 };
 

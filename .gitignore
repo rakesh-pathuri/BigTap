@@ -18,6 +18,13 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Android & module builds
+.gradle/
+build/
+modules/**/build/
+modules/**/.gradle/
+*.apk
+
 # Metro
 .metro-health-check*
 
@@ -26,9 +33,13 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# IDEs & system
 .DS_Store
 *.pem
+.claude/
+.idea/
+*.iml
+.vscode/
 
 # local env files
 .env*.local

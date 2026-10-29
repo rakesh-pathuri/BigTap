@@ -11,27 +11,31 @@ import { DeviceContactPreview } from '../types';
 export const exitToStandardLauncher = async (): Promise<boolean> => {
   try {
     if (Platform.OS === 'android') {
-      // Open Android Home Settings so the user can choose standard launcher
+      // 1. Open Android Home Settings so the user can choose standard launcher
       try {
-        await IntentLauncher.startActivityAsync(
-          'android.settings.HOME_SETTINGS'
-        );
+        await IntentLauncher.startActivityAsync('android.settings.HOME_SETTINGS');
         return true;
-      } catch {
-        // Fallback to manage default apps
-        try {
-          await IntentLauncher.startActivityAsync(
-            'android.settings.MANAGE_DEFAULT_APPS_SETTINGS'
-          );
-          return true;
-        } catch {
-          // Fallback to standard settings
-          await IntentLauncher.startActivityAsync(
-            IntentLauncher.ActivityAction.SETTINGS
-          );
-          return true;
-        }
-      }
+      } catch {}
+
+      // 2. Fallback to manage default apps
+      try {
+        await IntentLauncher.startActivityAsync('android.settings.MANAGE_DEFAULT_APPS_SETTINGS');
+        return true;
+      } catch {}
+
+      // 3. Fallback to App Details page where user can tap 'Clear Defaults' or 'Set as Default'
+      try {
+        await IntentLauncher.startActivityAsync('android.settings.APPLICATION_DETAILS_SETTINGS', {
+          data: 'package:com.ease.seniorlauncher',
+        });
+        return true;
+      } catch {}
+
+      // 4. Fallback to general settings
+      try {
+        await IntentLauncher.startActivityAsync(IntentLauncher.ActivityAction.SETTINGS);
+        return true;
+      } catch {}
     } else {
       // On iOS or Web, open system settings or show alert
       if (Platform.OS === 'ios') {

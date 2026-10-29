@@ -1,6 +1,5 @@
 import { Linking, Platform } from 'react-native';
 import * as Location from 'expo-location';
-import * as SMS from 'expo-sms';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { sendDirectSmsAsync } from '../../modules/direct-sms';
 
@@ -25,31 +24,37 @@ export const getGPSLocation = async (): Promise<string | null> => {
   return null;
 };
 
+export const normalizePhoneNumber = (rawNumber: string): string => {
+  if (!rawNumber) return '';
+  // 1. Replace placeholder masking 'X' with '0' for safe dialer formatting
+  let cleaned = rawNumber.replace(/X/gi, '0').replace(/[^0-9+*#]/g, '');
+
+  // 2. If it's a 12-digit number starting with 91 without '+' (e.g. 919876543210), prepend '+'
+  // Otherwise Indian carriers treat 91 as an invalid STD trunk code and say 'out of coverage area'
+  if (cleaned.length === 12 && cleaned.startsWith('91')) {
+    cleaned = `+${cleaned}`;
+  }
+
+  // 3. If it's an 11-digit number starting with 0 (e.g. 09876543210), strip the trunk '0'
+  if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    cleaned = cleaned.slice(1);
+  }
+
+  return cleaned;
+};
+
 /**
- * Places phone call AUTOMATICALLY using Android's native CALL action.
- * Requests CALL_PHONE permission so Android places the call directly without opening dialer.
+ * Opens phone call cleanly using the native system Phone app.
+ * Uses DIAL intent so no dangerous CALL_PHONE permissions or dialer conflicts are created.
  */
 export const makePhoneCall = async (phoneNumber: string): Promise<boolean> => {
   if (!phoneNumber) return false;
-  // Clean phone number keeping valid dial digits
-  const cleanNumber = phoneNumber.replace(/[^0-9+*#]/g, '');
+  const cleanNumber = normalizePhoneNumber(phoneNumber);
   if (!cleanNumber) return false;
 
   const url = `tel:${cleanNumber}`;
 
-  // 1. On Android standalone build with CALL_PHONE permission, try direct CALL intent
-  if (Platform.OS === 'android') {
-    try {
-      await IntentLauncher.startActivityAsync('android.intent.action.CALL', {
-        data: url,
-      });
-      return true;
-    } catch {
-      // Direct CALL not permitted or IntentLauncher pendingPromise busy, fallback to Linking
-    }
-  }
-
-  // 2. Cross-platform universal phone dialer launch via React Native Linking (never hangs)
+  // 1. Cross-platform universal phone dialer launch via React Native Linking (never hangs)
   try {
     const supported = await Linking.canOpenURL(url).catch(() => true);
     if (supported) {
@@ -60,7 +65,7 @@ export const makePhoneCall = async (phoneNumber: string): Promise<boolean> => {
     console.warn('Linking openURL error:', err);
   }
 
-  // 3. Fallback intent launcher dial
+  // 2. Direct intent launcher dial fallback
   if (Platform.OS === 'android') {
     try {
       await IntentLauncher.startActivityAsync('android.intent.action.DIAL', {
@@ -116,7 +121,7 @@ export const dispatchEmergencyAlert = async (
 
   // 1. Send automatic background SMS to all recipients without user interaction
   for (const recipient of recipients) {
-    const cleanPhone = recipient.phoneNumber.replace(/[^0-9+*#]/g, '');
+    const cleanPhone = normalizePhoneNumber(recipient.phoneNumber);
     if (!cleanPhone) continue;
 
     try {
@@ -131,21 +136,13 @@ export const dispatchEmergencyAlert = async (
     }
   }
 
-  // 2. If native direct SMS wasn't available (e.g. running in Expo Go), trigger standard fallback
+  // 2. If native direct SMS wasn't available, trigger standard fallback via SMS URL
   if (directSentCount === 0 && phonesToFallback.length > 0) {
     try {
-      const isAvailable = await SMS.isAvailableAsync();
-      if (isAvailable) {
-        const { result } = await SMS.sendSMSAsync(phonesToFallback, fullMessage);
-        if (result === 'sent') {
-          directSentCount = phonesToFallback.length;
-        }
-      } else {
-        const separator = Platform.OS === 'ios' ? '&' : '?';
-        const smsUrl = `sms:${phonesToFallback.join(',')}${separator}body=${encodeURIComponent(fullMessage)}`;
-        await Linking.openURL(smsUrl);
-        directSentCount = phonesToFallback.length;
-      }
+      const separator = Platform.OS === 'ios' ? '&' : '?';
+      const smsUrl = `sms:${phonesToFallback.join(',')}${separator}body=${encodeURIComponent(fullMessage)}`;
+      await Linking.openURL(smsUrl);
+      directSentCount = phonesToFallback.length;
     } catch (err) {
       console.warn('SMS dispatch error:', err);
     }

@@ -24,7 +24,6 @@ import {
 } from '../utils/storage';
 import { triggerHaptic } from '../utils/soundFeedback';
 import { pickContactPhoto } from '../utils/nativeLauncher';
-import { startIncomingCallRingtone, stopIncomingCallRingtone } from '../utils/ringtone';
 
 type ModalType =
   | 'none'
@@ -46,8 +45,6 @@ interface LauncherContextType {
   torchOn: boolean;
   activeModal: ModalType;
   selectedContactForCall: SpeedContact | null;
-  incomingCaller: SpeedContact | null;
-  isCallConnected: boolean;
   theme: ThemeColors;
   fontScale: FontScale;
   isLoading: boolean;
@@ -58,12 +55,6 @@ interface LauncherContextType {
   openModal: (modal: ModalType) => void;
   closeModal: () => void;
   setSelectedContactForCall: (c: SpeedContact | null) => void;
-
-  // Incoming Call Actions
-  triggerIncomingCall: (contact?: SpeedContact) => void;
-  answerIncomingCall: () => void;
-  declineIncomingCall: () => void;
-  endActiveCall: () => void;
 
   // Contact actions
   updateContact: (c: SpeedContact) => Promise<void>;
@@ -82,6 +73,7 @@ interface LauncherContextType {
 
   // Settings
   updateSettings: (partial: Partial<LauncherSettings>) => Promise<void>;
+  setWallpaper: (wallpaperId: string) => Promise<void>;
   setFontSize: (size: FontSizeMode) => Promise<void>;
   setThemeMode: (mode: ThemeMode) => Promise<void>;
   addEmergencyContact: (name: string, phoneNumber: string) => Promise<void>;
@@ -102,8 +94,6 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [torchOn, setTorchOnState] = useState<boolean>(false);
   const [activeModal, setActiveModal] = useState<ModalType>('none');
   const [selectedContactForCall, setSelectedContactForCall] = useState<SpeedContact | null>(null);
-  const [incomingCaller, setIncomingCaller] = useState<SpeedContact | null>(null);
-  const [isCallConnected, setIsCallConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Load persisted state on startup
@@ -153,44 +143,9 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const closeModal = () => {
-    stopIncomingCallRingtone();
     vibrate('light');
     setActiveModal('none');
     setSelectedContactForCall(null);
-  };
-
-  // Incoming Call Handlers
-  const triggerIncomingCall = (contact?: SpeedContact) => {
-    const caller = contact || (contacts.length > 0 ? contacts[0] : {
-      id: 'demo-caller',
-      name: 'Incoming Call',
-      phoneNumber: 'Unknown Number',
-      order: 0,
-      enabled: true,
-    });
-    setIncomingCaller(caller);
-    setIsCallConnected(false);
-    startIncomingCallRingtone();
-  };
-
-  const answerIncomingCall = () => {
-    stopIncomingCallRingtone();
-    vibrate('success');
-    setIsCallConnected(true);
-  };
-
-  const declineIncomingCall = () => {
-    stopIncomingCallRingtone();
-    vibrate('light');
-    setIncomingCaller(null);
-    setIsCallConnected(false);
-  };
-
-  const endActiveCall = () => {
-    stopIncomingCallRingtone();
-    vibrate('light');
-    setIncomingCaller(null);
-    setIsCallConnected(false);
   };
 
   const updateContact = async (updated: SpeedContact) => {
@@ -373,6 +328,11 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     vibrate('light');
   };
 
+  const setWallpaper = async (wallpaperId: string) => {
+    await updateSettings({ wallpaper: wallpaperId });
+    vibrate('light');
+  };
+
   return (
     <LauncherContext.Provider
       value={{
@@ -382,8 +342,6 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         torchOn,
         activeModal,
         selectedContactForCall,
-        incomingCaller,
-        isCallConnected,
         theme,
         fontScale,
         isLoading,
@@ -392,10 +350,6 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         openModal,
         closeModal,
         setSelectedContactForCall,
-        triggerIncomingCall,
-        answerIncomingCall,
-        declineIncomingCall,
-        endActiveCall,
         updateContact,
         addContact,
         deleteContact,
@@ -408,6 +362,7 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         updateAllApps,
         reorderApps,
         updateSettings,
+        setWallpaper,
         setFontSize,
         setThemeMode,
         addEmergencyContact,

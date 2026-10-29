@@ -1,6 +1,67 @@
 import { LauncherSettings, QuickAppItem, SpeedContact } from '../types';
 
-export const INITIAL_CONTACTS: SpeedContact[] = [];
+export const INITIAL_CONTACTS: SpeedContact[] = [
+  {
+    id: 'contact-dad',
+    name: 'Dad',
+    phoneNumber: '+91 98765 XX123',
+    relationship: 'Father',
+    color: '#1E40AF',
+    isEmergency: true,
+    order: 0,
+    enabled: true,
+  },
+  {
+    id: 'contact-mom',
+    name: 'Mom',
+    phoneNumber: '+91 98123 XX456',
+    relationship: 'Mother',
+    color: '#BE185D',
+    isEmergency: true,
+    order: 1,
+    enabled: true,
+  },
+  {
+    id: 'contact-dr-ramesh',
+    name: 'Dr. Ramesh',
+    phoneNumber: '+91 99401 XX789',
+    relationship: 'Doctor',
+    color: '#047857',
+    isEmergency: false,
+    order: 2,
+    enabled: true,
+  },
+  {
+    id: 'contact-priya',
+    name: 'Priya',
+    phoneNumber: '+91 97654 XX321',
+    relationship: 'Daughter',
+    color: '#6D28D9',
+    isEmergency: false,
+    order: 3,
+    enabled: true,
+  },
+  {
+    id: 'contact-rahul',
+    name: 'Rahul',
+    phoneNumber: '+91 98450 XX654',
+    relationship: 'Son',
+    color: '#C2410C',
+    isEmergency: false,
+    order: 4,
+    enabled: true,
+  },
+  {
+    id: 'contact-pharmacy',
+    name: 'Apollo Pharmacy',
+    phoneNumber: '+91 98234 XX999',
+    relationship: 'Pharmacy',
+    color: '#0284C7',
+    isEmergency: false,
+    order: 5,
+    enabled: true,
+  },
+];
 
 /**
  * Standard catalog of popular Android / phone applications.
@@ -216,10 +277,22 @@ export const INITIAL_SETTINGS: LauncherSettings = {
   theme: 'warm',
   speakOnTap: false,
   hapticFeedback: true,
-  emergencyNumber: '',
-  emergencyContactName: '',
-  emergencyContacts: [],
+  emergencyNumber: '+91 98765 XX123',
+  emergencyContactName: 'Dad',
+  emergencyContacts: [
+    {
+      id: 'emg-dad',
+      name: 'Dad',
+      phoneNumber: '+91 98765 XX123',
+    },
+    {
+      id: 'emg-mom',
+      name: 'Mom',
+      phoneNumber: '+91 98123 XX456',
+    },
+  ],
   emergencyMessage: 'EMERGENCY: I need help! Please check on me immediately.',
   caregiverPin: '',
   pinProtectionEnabled: false,
+  wallpaper: 'mountain_sunrise',
 };

@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLauncher } from '../context/LauncherContext';
 import { exitToStandardLauncher, openDeviceSettings } from '../utils/nativeLauncher';
 import { FontSizeMode, ThemeMode } from '../types';
+import { WALLPAPER_OPTIONS } from '../constants/wallpapers';
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -27,6 +28,7 @@ export const SettingsModal: React.FC = () => {
     theme,
     fontScale,
     updateSettings,
+    setWallpaper,
     setFontSize,
     setThemeMode,
     addEmergencyContact,
@@ -36,7 +38,6 @@ export const SettingsModal: React.FC = () => {
     toggleContactEnabled,
     deleteContact,
     changeContactPhotoAsync,
-    triggerIncomingCall,
     openModal,
     vibrate,
   } = useLauncher();
@@ -101,21 +102,6 @@ export const SettingsModal: React.FC = () => {
   const handleSaveEmergencyMsg = async () => {
     vibrate('success');
     await updateSettings({ emergencyMessage: emergencyMsgInput.trim() });
-  };
-
-  const handleTestIncomingCall = (contact?: any) => {
-    vibrate('medium');
-    closeModal();
-    const caller = contact || (contacts.length > 0 ? contacts[0] : {
-      id: 'test-caller',
-      name: 'Family Member',
-      phoneNumber: 'Incoming Call',
-      order: 0,
-      enabled: true,
-    });
-    setTimeout(() => {
-      triggerIncomingCall(caller);
-    }, 250);
   };
 
   const renderContactAvatar = (contact: any) => {
@@ -267,26 +253,6 @@ export const SettingsModal: React.FC = () => {
                   </View>
                 );
               })}
-            </View>
-
-            {/* Section: Incoming Call Screen Demo */}
-            <View style={[styles.sectionCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={[styles.sectionTitle, { color: theme.textPrimary, fontSize: fontScale.body }]}>
-                  Incoming Call
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: theme.accentBg, borderColor: theme.accent }]}
-                onPress={() => handleTestIncomingCall(contacts[0])}
-                activeOpacity={0.75}
-              >
-                <Ionicons name="call-outline" size={20} color={theme.accentText} />
-                <Text style={[styles.actionBtnText, { color: theme.accentText }]}>
-                  Test Incoming Call Screen
-                </Text>
-              </TouchableOpacity>
             </View>
 
             {/* Section: Apps */}
@@ -449,6 +415,84 @@ export const SettingsModal: React.FC = () => {
                   </TouchableOpacity>
                 ))}
               </View>
+            </View>
+
+            {/* Section: Wallpaper */}
+            <View style={[styles.sectionCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+              <View style={styles.sectionHeaderRow}>
+                <Text style={[styles.sectionTitle, { color: theme.textPrimary, fontSize: fontScale.body }]}>
+                  Wallpaper
+                </Text>
+              </View>
+              <Text style={[styles.wallpaperSubtitle, { color: theme.textSecondary, fontSize: fontScale.caption }]}>
+                Calm, gentle backgrounds designed to be comfortable on eyes
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.wallpaperScroll}
+              >
+                {WALLPAPER_OPTIONS.map((wp) => {
+                  const isSelected = (settings.wallpaper || 'mountain_sunrise') === wp.id;
+                  return (
+                    <TouchableOpacity
+                      key={wp.id}
+                      style={[
+                        styles.wallpaperCard,
+                        {
+                          borderColor: isSelected ? theme.accent : theme.cardBorder,
+                          borderWidth: isSelected ? 2.5 : 1,
+                          backgroundColor: theme.background,
+                        },
+                      ]}
+                      onPress={() => setWallpaper(wp.id)}
+                      activeOpacity={0.75}
+                    >
+                      {wp.thumbSource ? (
+                        <Image source={wp.thumbSource} style={styles.wallpaperThumb} resizeMode="cover" />
+                      ) : (
+                        <View style={[styles.wallpaperThumb, { backgroundColor: wp.previewColor, alignItems: 'center', justifyContent: 'center' }]}>
+                          <Ionicons name="color-palette-outline" size={26} color="#64748B" />
+                        </View>
+                      )}
+
+                      {/* Selected checkmark badge */}
+                      {isSelected ? (
+                        <View style={[styles.wallpaperCheckBadge, { backgroundColor: theme.accent }]}>
+                          <Ionicons name="checkmark" size={13} color="#FFFFFF" />
+                        </View>
+                      ) : null}
+
+                      <Text
+                        style={[
+                          styles.wallpaperCardName,
+                          {
+                            color: theme.textPrimary,
+                            fontSize: fontScale.caption,
+                            fontWeight: isSelected ? '700' : '600',
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {wp.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.wallpaperCardSub,
+                          {
+                            color: theme.textMuted,
+                            fontSize: fontScale.caption * 0.85,
+                          },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {wp.subtitle}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
 
             {/* Section: Emergency Contacts */}
@@ -892,5 +936,49 @@ const styles = StyleSheet.create({
   subSectionTitle: {
     fontWeight: '700',
     marginBottom: 2,
+  },
+  wallpaperSubtitle: {
+    marginTop: 2,
+    marginBottom: 12,
+  },
+  wallpaperScroll: {
+    paddingVertical: 4,
+    gap: 12,
+  },
+  wallpaperCard: {
+    width: 96,
+    borderRadius: 14,
+    padding: 6,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  wallpaperThumb: {
+    width: 82,
+    height: 124,
+    borderRadius: 10,
+    marginBottom: 6,
+  },
+  wallpaperCheckBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  wallpaperCardName: {
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  wallpaperCardSub: {
+    marginTop: 1,
+    textAlign: 'center',
   },
 });

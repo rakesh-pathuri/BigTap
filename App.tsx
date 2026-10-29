@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  AppState,
+  ImageBackground,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -21,59 +23,91 @@ import { YouTubeModal } from './src/components/YouTubeModal';
 import { ChooseContactsModal } from './src/components/ChooseContactsModal';
 import { ChooseAppsModal } from './src/components/ChooseAppsModal';
 import { SettingsModal } from './src/components/SettingsModal';
-import { IncomingCallModal } from './src/components/IncomingCallModal';
 import { NativeTorchController } from './src/components/NativeTorchController';
+import { WALLPAPER_OPTIONS } from './src/constants/wallpapers';
 
 const MainScreen: React.FC = () => {
-  const { theme } = useLauncher();
+  const { theme, settings } = useLauncher();
+  const scrollViewRef = useRef<any>(null);
 
-  // Ensures the Android system top status bar (signal, wifi, battery) is never blocked or overlapped
+  // Always reset homescreen scroll to top when coming back from other apps
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Ensures the Android system top status bar is never blocked or overlapped
   const androidTopInset = Platform.OS === 'android' ? RNStatusBar.currentHeight || 0 : 0;
+
+  const currentWallpaper = WALLPAPER_OPTIONS.find(
+    (w) => w.id === (settings.wallpaper || 'mountain_sunrise')
+  );
+  const isWallpaperActive = !!currentWallpaper?.source;
+
+  const content = (
+    <View style={[styles.container, !isWallpaperActive && { backgroundColor: theme.background }]}>
+      {/* Top Header: Time, Date & Settings with Battery below */}
+      <Header />
+
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.mainScroll}
+        contentContainerStyle={styles.mainScrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top Fixed Quick Actions: Flashlight, Phone, SOS */}
+        <FixedTopActions />
+
+        {/* Photo Contacts Speed-Dial Section */}
+        <PhotoContacts />
+
+        {/* Installed Phone Apps Grid */}
+        <AppsGrid />
+      </ScrollView>
+
+      {/* Background hardware torch controller on Android */}
+      <NativeTorchController />
+
+      {/* Action Modals */}
+      <CallConfirmModal />
+      <SOSModal />
+      <DialpadModal />
+      <CalculatorModal />
+      <YouTubeModal />
+      <ChooseContactsModal />
+      <ChooseAppsModal />
+      <SettingsModal />
+    </View>
+  );
 
   return (
     <SafeAreaView
       style={[
         styles.safeArea,
         {
-          backgroundColor: theme.headerBg,
+          backgroundColor: isWallpaperActive
+            ? currentWallpaper?.previewColor || theme.headerBg
+            : theme.headerBg,
           paddingTop: androidTopInset,
         },
       ]}
     >
       <StatusBar style={theme.statusBar === 'dark' ? 'dark' : 'light'} />
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
-        {/* Top Header: Time, Date, Battery %, Signal & Settings */}
-        <Header />
-
-        <ScrollView
-          style={styles.mainScroll}
-          contentContainerStyle={styles.mainScrollContent}
-          showsVerticalScrollIndicator={false}
+      {isWallpaperActive ? (
+        <ImageBackground
+          source={currentWallpaper.source}
+          style={styles.backgroundImage}
+          resizeMode="cover"
         >
-          {/* Top Fixed Quick Actions: Flashlight, Phone, SOS (Permanently pinned) */}
-          <FixedTopActions />
-
-          {/* Photo Contacts Speed-Dial Section */}
-          <PhotoContacts />
-
-          {/* Installed Phone Apps Grid (2 or 3 columns below contacts) */}
-          <AppsGrid />
-        </ScrollView>
-
-        {/* Background hardware torch controller on Android */}
-        <NativeTorchController />
-
-        {/* Action Modals */}
-        <CallConfirmModal />
-        <SOSModal />
-        <DialpadModal />
-        <CalculatorModal />
-        <YouTubeModal />
-        <ChooseContactsModal />
-        <ChooseAppsModal />
-        <SettingsModal />
-        <IncomingCallModal />
-      </View>
+          {content}
+        </ImageBackground>
+      ) : (
+        content
+      )}
     </SafeAreaView>
   );
 };
@@ -89,6 +123,11 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   container: {
     flex: 1,

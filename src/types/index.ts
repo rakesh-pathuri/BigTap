@@ -64,6 +64,7 @@ export interface LauncherSettings {
   emergencyMessage: string;
   caregiverPin: string;
   pinProtectionEnabled: boolean;
+  wallpaper?: string;
 }
 
 export interface DeviceContactPreview {

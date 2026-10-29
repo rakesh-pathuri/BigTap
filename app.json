@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Ease - Senior Launcher",
-    "slug": "ease-launcher",
-    "version": "1.0.0",
+    "name": "BigTap",
+    "slug": "bigtap-launcher",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,6 +15,7 @@
     },
     "android": {
       "package": "com.ease.seniorlauncher",
+      "versionCode": 5,
       "adaptiveIcon": {
         "backgroundColor": "#F4F7FB",
         "foregroundImage": "./assets/android-icon-foreground.png"
@@ -27,25 +28,11 @@
             "HOME",
             "DEFAULT"
           ]
-        },
-        {
-          "action": "VIEW",
-          "data": {
-            "scheme": "tel"
-          }
-        },
-        {
-          "action": "VIEW",
-          "data": {
-            "scheme": "sms"
-          }
         }
       ],
       "permissions": [
-        "android.permission.CAMERA",
         "android.permission.FLASHLIGHT",
         "android.permission.READ_CONTACTS",
-        "android.permission.CALL_PHONE",
         "android.permission.SEND_SMS",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",

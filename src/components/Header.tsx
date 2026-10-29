@@ -5,7 +5,7 @@ import { useLauncher } from '../context/LauncherContext';
 import { useDeviceStatus } from '../utils/deviceStatus';
 
 export const Header: React.FC = () => {
-  const { theme, fontScale, openModal, vibrate } = useLauncher();
+  const { theme, fontScale, openModal, vibrate, settings } = useLauncher();
   const deviceStatus = useDeviceStatus();
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
@@ -57,9 +57,16 @@ export const Header: React.FC = () => {
     openModal('settings');
   };
 
+  const isWallpaperActive = settings.wallpaper && settings.wallpaper !== 'none';
+
   return (
-    <View style={[styles.container, { backgroundColor: theme.headerBg }]}>
-      {/* Top Left: Time & Date as earlier */}
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isWallpaperActive ? 'transparent' : theme.headerBg },
+      ]}
+    >
+      {/* Top Left: Time & Date */}
       <View style={styles.timeSection}>
         <View style={styles.timeRow}>
           <Text
@@ -98,69 +105,56 @@ export const Header: React.FC = () => {
         >
           {dateString}
         </Text>
-
-        {/* Battery percentage in number & Mobile Signal placed below */}
-        <View style={styles.statusRowBelow}>
-          {/* Battery Chip */}
-          <View style={[styles.statusChip, { backgroundColor: theme.accentBg }]}>
-            <Ionicons
-              name={
-                deviceStatus.isCharging
-                  ? 'battery-charging'
-                  : deviceStatus.batteryLevel > 70
-                  ? 'battery-full'
-                  : deviceStatus.batteryLevel > 20
-                  ? 'battery-half'
-                  : 'battery-dead'
-              }
-              size={17}
-              color={deviceStatus.batteryLevel <= 20 ? theme.danger : theme.accentText}
-            />
-            <Text
-              style={[
-                styles.statusNumber,
-                {
-                  color: deviceStatus.batteryLevel <= 20 ? theme.danger : theme.accentText,
-                  fontSize: fontScale.caption * 1.05,
-                },
-              ]}
-            >
-              {deviceStatus.batteryLevel}%
-            </Text>
-          </View>
-
-          {/* Mobile Signal Chip */}
-          <View style={[styles.statusChip, { backgroundColor: theme.accentBg }]}>
-            <Ionicons
-              name={deviceStatus.networkType === 'wifi' ? 'wifi' : 'cellular'}
-              size={16}
-              color={theme.accentText}
-            />
-            <Text
-              style={[
-                styles.statusLabel,
-                {
-                  color: theme.accentText,
-                  fontSize: fontScale.caption,
-                },
-              ]}
-            >
-              {deviceStatus.networkName}
-            </Text>
-          </View>
-        </View>
       </View>
 
-      {/* Top Right: Settings Icon kept bare and clean */}
-      <TouchableOpacity
-        style={styles.settingsIconButton}
-        onPress={handleSettingsTap}
-        activeOpacity={0.65}
-        accessibilityLabel="Settings"
-        accessibilityRole="button"
-      >
-        <Ionicons name="settings-outline" size={28} color={theme.textPrimary} />
-      </TouchableOpacity>
+      {/* Top Right: Settings Icon with Battery below it aligned horizontally */}
+      <View style={styles.rightSection}>
+        <TouchableOpacity
+          style={styles.settingsIconButton}
+          onPress={handleSettingsTap}
+          activeOpacity={0.65}
+          accessibilityLabel="Settings"
+          accessibilityRole="button"
+        >
+          <Ionicons name="settings-outline" size={28} color={theme.textPrimary} />
+        </TouchableOpacity>
+
+        {/* Battery percentage aligned below settings icon horizontally */}
+        <View
+          style={[
+            styles.batteryChipHorizontal,
+            {
+              backgroundColor: theme.card,
+              borderColor: theme.cardBorder,
+            },
+          ]}
+        >
+          <Ionicons
+            name={
+              deviceStatus.isCharging
+                ? 'battery-charging'
+                : deviceStatus.batteryLevel > 70
+                ? 'battery-full'
+                : deviceStatus.batteryLevel > 20
+                ? 'battery-half'
+                : 'battery-dead'
+            }
+            size={16}
+            color={deviceStatus.batteryLevel <= 20 ? theme.danger : theme.textPrimary}
+          />
+          <Text
+            style={[
+              styles.batteryNumber,
+              {
+                color: deviceStatus.batteryLevel <= 20 ? theme.danger : theme.textPrimary,
+                fontSize: fontScale.caption * 1.05,
+              },
+            ]}
+          >
+            {deviceStatus.batteryLevel}%
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -168,8 +162,8 @@ export const Header: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 22,
-    paddingTop: 18,
-    paddingBottom: 12,
+    paddingTop: 28,
+    paddingBottom: 14,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
@@ -192,33 +186,30 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: '500',
     marginTop: 2,
-    marginBottom: 8,
+    marginBottom: 2,
   },
-  statusRowBelow: {
-    flexDirection: 'row',
+  rightSection: {
     alignItems: 'center',
-    gap: 8,
-    marginTop: 2,
-  },
-  statusChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 10,
-    gap: 5,
-  },
-  statusNumber: {
-    fontWeight: '800',
-  },
-  statusLabel: {
-    fontWeight: '700',
+    justifyContent: 'center',
   },
   settingsIconButton: {
     width: 44,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
+  },
+  batteryChipHorizontal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 2,
+    gap: 4,
+  },
+  batteryNumber: {
+    fontWeight: '700',
   },
 });
