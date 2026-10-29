@@ -1,7 +1,52 @@
-import { Linking, Platform } from 'react-native';
+import { Linking, PermissionsAndroid, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { sendDirectSmsAsync } from '../../modules/direct-sms';
+
+export const isPlaceholderPhoneNumber = (phone: string): boolean => {
+  if (!phone || typeof phone !== 'string') return true;
+  return /x/i.test(phone) || phone.replace(/[^0-9]/g, '').length < 3;
+};
+
+export const normalizePhoneNumber = (rawNumber: string): string => {
+  if (!rawNumber) return '';
+  let cleaned = rawNumber.replace(/[^0-9+*#]/g, '');
+
+  if (cleaned.length === 12 && cleaned.startsWith('91')) {
+    cleaned = `+${cleaned}`;
+  }
+
+  if (cleaned.length === 11 && cleaned.startsWith('0')) {
+    cleaned = cleaned.slice(1);
+  }
+
+  return cleaned;
+};
+
+export const requestSmsPermissionAsync = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return false;
+  try {
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.SEND_SMS
+    );
+    if (hasPermission) return true;
+
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.SEND_SMS,
+      {
+        title: 'SMS Permission Required',
+        message:
+          'BigTap needs permission to send emergency SMS alerts with your GPS location to your family.',
+        buttonPositive: 'Allow',
+        buttonNegative: 'Deny',
+      }
+    );
+    return status === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn('Failed to request SEND_SMS permission:', err);
+    return false;
+  }
+};
 
 export const getGPSLocation = async (): Promise<string | null> => {
   try {
@@ -24,29 +69,6 @@ export const getGPSLocation = async (): Promise<string | null> => {
   return null;
 };
 
-export const normalizePhoneNumber = (rawNumber: string): string => {
-  if (!rawNumber) return '';
-  // 1. Replace placeholder masking 'X' with '0' for safe dialer formatting
-  let cleaned = rawNumber.replace(/X/gi, '0').replace(/[^0-9+*#]/g, '');
-
-  // 2. If it's a 12-digit number starting with 91 without '+' (e.g. 919876543210), prepend '+'
-  // Otherwise Indian carriers treat 91 as an invalid STD trunk code and say 'out of coverage area'
-  if (cleaned.length === 12 && cleaned.startsWith('91')) {
-    cleaned = `+${cleaned}`;
-  }
-
-  // 3. If it's an 11-digit number starting with 0 (e.g. 09876543210), strip the trunk '0'
-  if (cleaned.length === 11 && cleaned.startsWith('0')) {
-    cleaned = cleaned.slice(1);
-  }
-
-  return cleaned;
-};
-
-/**
- * Opens phone call cleanly using the native system Phone app.
- * Uses DIAL intent so no dangerous CALL_PHONE permissions or dialer conflicts are created.
- */
 export const makePhoneCall = async (phoneNumber: string): Promise<boolean> => {
   if (!phoneNumber) return false;
   const cleanNumber = normalizePhoneNumber(phoneNumber);
@@ -54,7 +76,6 @@ export const makePhoneCall = async (phoneNumber: string): Promise<boolean> => {
 
   const url = `tel:${cleanNumber}`;
 
-  // 1. Cross-platform universal phone dialer launch via React Native Linking (never hangs)
   try {
     const supported = await Linking.canOpenURL(url).catch(() => true);
     if (supported) {
@@ -65,7 +86,6 @@ export const makePhoneCall = async (phoneNumber: string): Promise<boolean> => {
     console.warn('Linking openURL error:', err);
   }
 
-  // 2. Direct intent launcher dial fallback
   if (Platform.OS === 'android') {
     try {
       await IntentLauncher.startActivityAsync('android.intent.action.DIAL', {
@@ -88,7 +108,6 @@ export interface EmergencyResult {
   smsSent: boolean;
   smsSentCount: number;
   totalRecipients: number;
-  callInitiated: boolean;
   locationString?: string;
   recipientSummary: string;
   error?: string;
@@ -98,45 +117,63 @@ export const dispatchEmergencyAlert = async (
   recipientsInput: EmergencyRecipient[] | string,
   baseMessage: string
 ): Promise<EmergencyResult> => {
-  // Normalize recipients array
-  const recipients: EmergencyRecipient[] = Array.isArray(recipientsInput)
+  const rawList: EmergencyRecipient[] = Array.isArray(recipientsInput)
     ? recipientsInput.filter((r) => r && r.phoneNumber)
     : recipientsInput
     ? [{ name: 'Emergency Contact', phoneNumber: recipientsInput }]
     : [];
 
+  // Filter out placeholder demo numbers
+  const validRecipients = rawList.filter(
+    (r) => !isPlaceholderPhoneNumber(r.phoneNumber)
+  );
+
+  if (validRecipients.length === 0) {
+    return {
+      success: false,
+      smsSent: false,
+      smsSentCount: 0,
+      totalRecipients: 0,
+      recipientSummary: 'No Contacts',
+      error: 'No emergency contacts configured. Please set them in Settings.',
+    };
+  }
+
   let locationUrl: string | null = null;
   try {
     locationUrl = await getGPSLocation();
-  } catch {
-    // Location failed, proceed with alert anyway
-  }
+  } catch {}
 
   const fullMessage = locationUrl
     ? `${baseMessage}\n\nEmergency GPS Location:\n${locationUrl}`
     : `${baseMessage}\n\n(GPS location could not be determined)`;
 
+  const hasSmsPermission = await requestSmsPermissionAsync();
+
   let directSentCount = 0;
   const phonesToFallback: string[] = [];
 
-  // 1. Send automatic background SMS to all recipients without user interaction
-  for (const recipient of recipients) {
+  for (const recipient of validRecipients) {
     const cleanPhone = normalizePhoneNumber(recipient.phoneNumber);
     if (!cleanPhone) continue;
 
-    try {
-      const sentDirect = await sendDirectSmsAsync(cleanPhone, fullMessage);
-      if (sentDirect) {
-        directSentCount++;
-      } else {
+    if (hasSmsPermission) {
+      try {
+        const sent = await sendDirectSmsAsync(cleanPhone, fullMessage);
+        if (sent) {
+          directSentCount++;
+        } else {
+          phonesToFallback.push(cleanPhone);
+        }
+      } catch {
         phonesToFallback.push(cleanPhone);
       }
-    } catch {
+    } else {
       phonesToFallback.push(cleanPhone);
     }
   }
 
-  // 2. If native direct SMS wasn't available, trigger standard fallback via SMS URL
+  // Fallback to opening SMS composer if direct background SMS fails or lacks permission
   if (directSentCount === 0 && phonesToFallback.length > 0) {
     try {
       const separator = Platform.OS === 'ios' ? '&' : '?';
@@ -144,26 +181,21 @@ export const dispatchEmergencyAlert = async (
       await Linking.openURL(smsUrl);
       directSentCount = phonesToFallback.length;
     } catch (err) {
-      console.warn('SMS dispatch error:', err);
+      console.warn('SMS fallback error:', err);
     }
   }
 
-  // 3. Auto-dial the primary emergency contact
-  const primaryPhone = recipients.length > 0 ? recipients[0].phoneNumber : '';
-  const callInitiated = primaryPhone ? await makePhoneCall(primaryPhone) : false;
-
-  const namesList = recipients
+  const namesList = validRecipients
     .map((r) => r.name || r.phoneNumber)
     .filter(Boolean)
     .join(', ');
 
   return {
-    success: directSentCount > 0 || callInitiated,
+    success: directSentCount > 0,
     smsSent: directSentCount > 0,
     smsSentCount: directSentCount,
-    totalRecipients: recipients.length,
-    callInitiated,
+    totalRecipients: validRecipients.length,
     locationString: locationUrl || undefined,
-    recipientSummary: namesList || 'Emergency Services',
+    recipientSummary: namesList || 'Emergency Contact',
   };
 };

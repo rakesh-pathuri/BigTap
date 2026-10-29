@@ -50,7 +50,6 @@ const MainScreen: React.FC = () => {
 
   const content = (
     <View style={[styles.container, !isWallpaperActive && { backgroundColor: theme.background }]}>
-      {/* Top Header: Time, Date & Settings with Battery below */}
       <Header />
 
       <ScrollView
@@ -59,20 +58,13 @@ const MainScreen: React.FC = () => {
         contentContainerStyle={styles.mainScrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Fixed Quick Actions: Flashlight, Phone, SOS */}
         <FixedTopActions />
-
-        {/* Photo Contacts Speed-Dial Section */}
         <PhotoContacts />
-
-        {/* Installed Phone Apps Grid */}
         <AppsGrid />
       </ScrollView>
 
-      {/* Background hardware torch controller on Android */}
       <NativeTorchController />
 
-      {/* Action Modals */}
       <CallConfirmModal />
       <SOSModal />
       <DialpadModal />

@@ -39,11 +39,3 @@ export const triggerHaptic = async (
     // Non-fatal if device doesn't support specific haptic
   }
 };
-
-export const speakText = async (_text: string, _enabled: boolean = true) => {
-  // Voice speech is completely disabled per user preference
-};
-
-export const stopSpeaking = async () => {
-  // No-op
-};

@@ -81,7 +81,6 @@ interface LauncherContextType {
   toggleContactIsEmergency: (contactId: string) => Promise<void>;
 
   // Feedback
-  speak: (text: string) => void;
   vibrate: (type?: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error') => void;
 }
 
@@ -122,10 +121,6 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const vibrate = (type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' = 'medium') => {
     triggerHaptic(type, settings.hapticFeedback);
-  };
-
-  const speak = (_text: string) => {
-    // Voice speech completely removed per user preference
   };
 
   const setTorchOn = (on: boolean) => {
@@ -368,7 +363,6 @@ export const LauncherProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         addEmergencyContact,
         removeEmergencyContact,
         toggleContactIsEmergency,
-        speak,
         vibrate,
       }}
     >

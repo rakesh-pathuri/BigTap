@@ -36,7 +36,6 @@ yarn-error.*
 # IDEs & system
 .DS_Store
 *.pem
-.claude/
 .idea/
 *.iml
 .vscode/

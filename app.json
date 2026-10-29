@@ -14,7 +14,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.ease.seniorlauncher",
+      "package": "com.bigtap.launcher",
       "versionCode": 5,
       "adaptiveIcon": {
         "backgroundColor": "#F4F7FB",

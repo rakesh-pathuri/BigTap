@@ -10,10 +10,6 @@ import { useLauncher } from '../context/LauncherContext';
 import { QuickAppItem } from '../types';
 import { launchCalculatorApp, launchExternalApp } from '../utils/nativeLauncher';
 
-/**
- * Grid of phone apps displayed below contacts.
- * Pure squircle icons without card boxes or titles below.
- */
 export const AppsGrid: React.FC = () => {
   const {
     apps,

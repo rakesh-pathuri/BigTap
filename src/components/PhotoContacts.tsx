@@ -58,7 +58,6 @@ export const PhotoContacts: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Simple Clean Heading: Contacts */}
       <View style={styles.sectionHeader}>
         <Text
           style={[
@@ -83,7 +82,6 @@ export const PhotoContacts: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Grid of Pure Photos or Initials (No names, no call buttons, 1-tap call) */}
       {enabledContacts.length === 0 ? (
         <TouchableOpacity
           style={[

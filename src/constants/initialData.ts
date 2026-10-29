@@ -63,11 +63,6 @@ export const INITIAL_CONTACTS: SpeedContact[] = [
   },
 ];
 
-/**
- * Standard catalog of popular Android / phone applications.
- * Flashlight, Phone, and SOS are permanently fixed at the top of the home screen,
- * so this catalog contains the remaining apps displayed in the grid below contacts.
- */
 export const ALL_AVAILABLE_PHONE_APPS: QuickAppItem[] = [
   {
     id: 'app-whatsapp',
@@ -275,24 +270,10 @@ export const INITIAL_QUICK_APPS: QuickAppItem[] = ALL_AVAILABLE_PHONE_APPS.filte
 export const INITIAL_SETTINGS: LauncherSettings = {
   fontSize: 'large',
   theme: 'warm',
-  speakOnTap: false,
   hapticFeedback: true,
-  emergencyNumber: '+91 98765 XX123',
-  emergencyContactName: 'Dad',
-  emergencyContacts: [
-    {
-      id: 'emg-dad',
-      name: 'Dad',
-      phoneNumber: '+91 98765 XX123',
-    },
-    {
-      id: 'emg-mom',
-      name: 'Mom',
-      phoneNumber: '+91 98123 XX456',
-    },
-  ],
+  emergencyNumber: '',
+  emergencyContactName: '',
+  emergencyContacts: [],
   emergencyMessage: 'EMERGENCY: I need help! Please check on me immediately.',
-  caregiverPin: '',
-  pinProtectionEnabled: false,
   wallpaper: 'mountain_sunrise',
 };

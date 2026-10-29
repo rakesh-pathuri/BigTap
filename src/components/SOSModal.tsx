@@ -8,7 +8,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLauncher } from '../context/LauncherContext';
-import { dispatchEmergencyAlert, EmergencyResult } from '../utils/emergency';
+import {
+  dispatchEmergencyAlert,
+  EmergencyResult,
+  isPlaceholderPhoneNumber,
+} from '../utils/emergency';
 
 export const SOSModal: React.FC = () => {
   const {
@@ -29,6 +33,7 @@ export const SOSModal: React.FC = () => {
     const seen = new Set<string>();
 
     const add = (name: string, phone: string) => {
+      if (isPlaceholderPhoneNumber(phone)) return;
       const clean = phone.replace(/[^0-9+*#]/g, '');
       if (clean && !seen.has(clean)) {
         seen.add(clean);
@@ -115,9 +120,10 @@ export const SOSModal: React.FC = () => {
                     : 'ALERT RECIPIENT'}
                 </Text>
                 {recipients.length === 0 ? (
-                  <Text style={styles.noRecipientText}>
-                    No emergency contacts configured. Please set them in Settings.
-                  </Text>
+                  <View style={styles.recipientItem}>
+                    <Text style={styles.recipientName}>No Contacts Configured</Text>
+                    <Text style={styles.recipientPhone}>Add emergency contacts in Settings</Text>
+                  </View>
                 ) : (
                   recipients.map((r, idx) => (
                     <View key={idx} style={styles.recipientItem}>
@@ -137,7 +143,9 @@ export const SOSModal: React.FC = () => {
               </View>
 
               <Text style={styles.noticeText}>
-                Sends automatic SMS alerts with GPS location to all contacts and auto-dials your primary contact.
+                {recipients.length > 0
+                  ? 'Sends automatic background SMS alerts with your live GPS location to all emergency contacts.'
+                  : 'No custom contacts configured. Please add emergency contacts in Settings.'}
               </Text>
 
               {/* Action Buttons */}
@@ -146,13 +154,13 @@ export const SOSModal: React.FC = () => {
                   style={[styles.btn, styles.sendBtn]}
                   onPress={triggerEmergency}
                   activeOpacity={0.8}
-                  disabled={isAlerting}
+                  disabled={isAlerting || recipients.length === 0}
                   accessibilityLabel="Send distress alert immediately"
                   accessibilityRole="button"
                 >
-                  <Ionicons name="call" size={20} color="#FFFFFF" />
+                  <Ionicons name="paper-plane" size={20} color="#FFFFFF" />
                   <Text style={[styles.sendBtnText, { fontSize: fontScale.buttonLabel }]}>
-                    {isAlerting ? 'Dispatching...' : 'Send Alert Now'}
+                    {isAlerting ? 'Sending SMS...' : 'Send SMS Alert Now'}
                   </Text>
                 </TouchableOpacity>
 
@@ -184,15 +192,8 @@ export const SOSModal: React.FC = () => {
               <Text style={styles.dispatchedSub}>
                 {result.smsSentCount > 0
                   ? `Automatic background SMS sent to ${result.smsSentCount} contact${result.smsSentCount > 1 ? 's' : ''}`
-                  : `Distress notification triggered to ${result.recipientSummary}`}
+                  : result.error || 'Emergency alert completed.'}
               </Text>
-
-              {result.callInitiated ? (
-                <View style={styles.callRow}>
-                  <Ionicons name="call" size={15} color="#10B981" />
-                  <Text style={styles.callText}>Phone call initiated to primary contact</Text>
-                </View>
-              ) : null}
 
               {result.locationString ? (
                 <View style={styles.gpsRow}>

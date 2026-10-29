@@ -8,7 +8,8 @@ try {
 }
 
 /**
- * Sends a background SMS directly via Android SmsManager without opening the messaging app.
+ * Sends a background SMS directly via Android SmsManager.
+ * Waits for carrier broadcast confirmation (RESULT_OK) before reporting success.
  * Requires android.permission.SEND_SMS.
  */
 export const sendDirectSmsAsync = async (
@@ -41,4 +42,3 @@ export const setTorchNativeAsync = async (enabled: boolean): Promise<boolean> =>
   }
   return false;
 };
-

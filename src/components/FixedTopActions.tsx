@@ -13,10 +13,6 @@ import { openNativePhoneApp } from '../utils/nativeLauncher';
 const TORCH_OFF_ICON = require('../../assets/torch_off.png');
 const TORCH_ON_ICON = require('../../assets/torch_on.png');
 
-/**
- * Top fixed quick actions: Flashlight, Phone, and SOS.
- * Named "Essentials" section with pure squircle icons.
- */
 export const FixedTopActions: React.FC = () => {
   const {
     torchOn,

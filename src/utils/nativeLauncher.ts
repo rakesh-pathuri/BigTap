@@ -5,28 +5,25 @@ import * as ImagePicker from 'expo-image-picker';
 import { DeviceContactPreview } from '../types';
 
 /**
- * Exits the Ease Launcher to the device's default home screen or opens
- * Android's Default Home App chooser so the caregiver/user can use the rest of the phone.
+ * Opens Android's Default Home App chooser or settings
+ * so the caregiver/user can switch launchers.
  */
 export const exitToStandardLauncher = async (): Promise<boolean> => {
   try {
     if (Platform.OS === 'android') {
-      // 1. Open Android Home Settings so the user can choose standard launcher
       try {
         await IntentLauncher.startActivityAsync('android.settings.HOME_SETTINGS');
         return true;
       } catch {}
 
-      // 2. Fallback to manage default apps
       try {
         await IntentLauncher.startActivityAsync('android.settings.MANAGE_DEFAULT_APPS_SETTINGS');
         return true;
       } catch {}
 
-      // 3. Fallback to App Details page where user can tap 'Clear Defaults' or 'Set as Default'
       try {
         await IntentLauncher.startActivityAsync('android.settings.APPLICATION_DETAILS_SETTINGS', {
-          data: 'package:com.ease.seniorlauncher',
+          data: 'package:com.bigtap.launcher',
         });
         return true;
       } catch {}

@@ -66,7 +66,6 @@ export const Header: React.FC = () => {
         { backgroundColor: isWallpaperActive ? 'transparent' : theme.headerBg },
       ]}
     >
-      {/* Top Left: Time & Date */}
       <View style={styles.timeSection}>
         <View style={styles.timeRow}>
           <Text
@@ -93,7 +92,6 @@ export const Header: React.FC = () => {
           </Text>
         </View>
 
-        {/* Date */}
         <Text
           style={[
             styles.dateText,
@@ -107,7 +105,6 @@ export const Header: React.FC = () => {
         </Text>
       </View>
 
-      {/* Top Right: Settings Icon with Battery below it aligned horizontally */}
       <View style={styles.rightSection}>
         <TouchableOpacity
           style={styles.settingsIconButton}
@@ -119,7 +116,6 @@ export const Header: React.FC = () => {
           <Ionicons name="settings-outline" size={28} color={theme.textPrimary} />
         </TouchableOpacity>
 
-        {/* Battery percentage aligned below settings icon horizontally */}
         <View
           style={[
             styles.batteryChipHorizontal,

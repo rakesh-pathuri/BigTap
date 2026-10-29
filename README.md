@@ -91,7 +91,7 @@ Modern smartphones are often too complex for elderly parents and grandparents. A
 - **Essentials Bar:**
   - **Flashlight / Torch:** Instant hardware torch toggle using the device flash.
   - **Phone:** Quick launch to the native dialer (with a built-in big dialpad fallback).
-  - **Emergency SOS:** Triggers an emergency call and sends an immediate SMS with live GPS coordinates to family contacts.
+  - **Emergency SOS:** Single-tap emergency sequence that captures live GPS coordinates and dispatches direct background SMS alerts to all family contacts with real-time carrier confirmation.
 - **Speed-Dial Photo Contacts:**
   - Large photo or color-initial tiles for loved ones.
   - 1-tap direct calling with haptic confirmation.
@@ -109,9 +109,11 @@ Modern smartphones are often too complex for elderly parents and grandparents. A
 - **Time & Battery Glance:**
   - High-visibility clock with full date display.
   - Horizontal battery indicator and charging status.
-- **Caregiver Controls:**
-  - Manage apps and contacts from a clean settings panel.
-  - Optional PIN lock to prevent accidental layout modifications.
+- **Caregiver Controls & Customization:**
+  - Add or remove speed-dial contacts directly with custom photos or initials.
+  - Manage the home app grid by toggling installed app visibility.
+  - Configure emergency phone numbers and personalized SOS message text.
+  - Switch themes (Light / Dark) and adjust interface font sizing (Normal, Large, Extra Large).
 
 ---
 
@@ -203,7 +205,7 @@ BigTap requires only the permissions needed for safety and senior care:
 | Permission | Reason |
 | :--- | :--- |
 | `android.permission.READ_CONTACTS` | Lets caregivers easily pick speed-dial contacts from the device phonebook. |
-| `android.permission.SEND_SMS` | Dispatches emergency alerts with location to family when the SOS button is pressed. |
+| `android.permission.SEND_SMS` | Dispatches direct emergency SMS alerts with GPS coordinates to family contacts. |
 | `android.permission.ACCESS_FINE_LOCATION` | Appends current GPS coordinates to emergency SMS messages. |
 | `android.permission.FLASHLIGHT` | Enables the one-touch hardware flashlight. |
 | `android.permission.VIBRATE` | Provides accessible haptic feedback on button taps. |
@@ -221,9 +223,9 @@ BigTap requires only the permissions needed for safety and senior care:
 - **Reason:** The camera hardware might be temporarily locked by another app (like the native camera).
 - **Fix:** Close any background camera apps, or tap the Torch button twice to rebind the hardware torch via `CameraManager`.
 
-### 3. Emergency SMS not sending
-- **Reason:** Android requires runtime SMS permission to send direct messages.
-- **Fix:** Go to **Settings > Apps > BigTap > Permissions** and ensure **SMS** and **Location** are set to **Allow**.
+### 3. Emergency SMS Permissions
+- **Reason:** Android requires runtime permissions (`SEND_SMS` and `ACCESS_FINE_LOCATION`) to send background SMS alerts with GPS coordinates.
+- **Fix:** BigTap prompts for these permissions at runtime when SOS is activated. If previously denied, grant them in **Settings > Apps > BigTap > Permissions**.
 
 ### 4. Gradle build failure: `Duplicate resources`
 - **Fix:** Ensure there are no duplicate `.png` and `.webp` launcher icons with the same name in `android/app/src/main/res/mipmap-*`. Clean the build directory before rebuilding:

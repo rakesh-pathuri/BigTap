@@ -56,14 +56,11 @@ export interface EmergencyContact {
 export interface LauncherSettings {
   fontSize: FontSizeMode;
   theme: ThemeMode;
-  speakOnTap: boolean;
   hapticFeedback: boolean;
   emergencyNumber: string;
   emergencyContactName: string;
   emergencyContacts: EmergencyContact[];
   emergencyMessage: string;
-  caregiverPin: string;
-  pinProtectionEnabled: boolean;
   wallpaper?: string;
 }
 
