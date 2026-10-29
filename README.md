@@ -22,14 +22,14 @@
 ## Screenshots
 
 <p align="center">
-  <img src="./docs/screenshots/home_light.jpg" width="31%" alt="Home Light Theme" />
-  &nbsp;
   <img src="./docs/screenshots/home_scenic.jpg" width="31%" alt="Scenic Wallpaper" />
   &nbsp;
-  <img src="./docs/screenshots/home_dark.jpg" width="31%" alt="Home Dark Theme" />
+  <img src="./docs/screenshots/home_light.jpg" width="31%" alt="Home Light Theme" />
+  &nbsp;
+  <img src="./docs/screenshots/apps_grid.jpg" width="31%" alt="Curated Apps Grid" />
 </p>
 <p align="center">
-  <img src="./docs/screenshots/apps_grid.jpg" width="31%" alt="Curated Apps Grid" />
+  <img src="./docs/screenshots/home_dark.jpg" width="31%" alt="Home Dark Theme" />
   &nbsp;
   <img src="./docs/screenshots/wallpaper_selection.jpg" width="31%" alt="Wallpaper Picker" />
   &nbsp;
