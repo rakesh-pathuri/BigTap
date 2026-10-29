@@ -24,12 +24,15 @@
   </a>
 </p>
 
-> [!IMPORTANT]
-> **Note on Google Play Protect during installation:**  
-> Because BigTap uses sensitive hardware permissions (`SEND_SMS` and `ACCESS_FINE_LOCATION`) for its one-touch Emergency SOS feature, Google Play Protect may display a warning (*"Unsafe app blocked"* or *"Blocked by Play Protect"*) when sideloading the APK outside the Play Store.  
-> - **To continue:** Tap **"More details"** ➔ **"Install anyway"**.  
-> - **If blocked:** Temporarily pause Play Protect scanning during installation:  
->   Open **Google Play Store** ➔ Tap your profile picture (top right) ➔ **Play Protect** ➔ Tap the **Settings gear icon** (top right) ➔ Toggle off **"Scan apps with Play Protect"** ➔ Install BigTap ➔ Turn Play Protect back on.
+> [!NOTE]
+> **APK Sideloading & Security Verification:**  
+> When installing the APK directly outside the Play Store, Android shows a standard confirmation for sideloaded apps. If Google Play Protect displays a prompt, tap **"More details"** ➔ **"Install anyway"**.  
+> **Never disable Google Play Protect.** Instead, verify your download integrity against the official release checksum:  
+> ```text
+> SHA-256: e25bf98ceb3fcea934684dc0087a0b15d6dd2134ee10567dff5a5ca401804954
+> ```
+> *(Verify in PowerShell: `Get-FileHash bigtap-launcher.apk` or in Bash: `sha256sum bigtap-launcher.apk`)*  
+> Releases are consistently signed, and official distribution via **F-Droid** and the **Google Play Store** is planned.
 
 ---
 
@@ -164,13 +167,16 @@ Modern smartphones are often too complex for elderly parents and grandparents. A
    npm install
    ```
 
-3. **Verify typecheck and linting:**
+3. **Verify typecheck, linting, and unit tests:**
    ```bash
    # TypeScript type check
    npx tsc --noEmit
 
    # Lint check
-   npx expo lint
+   npm run lint
+
+   # Run Jest unit tests
+   npm test
    ```
 
 4. **Run on a connected Android phone or emulator:**
@@ -234,9 +240,9 @@ BigTap requires only the permissions needed for safety and senior care:
   ./gradlew clean
   ```
 
-### 5. Google Play Protect blocks installation
-- **Reason:** BigTap uses `SEND_SMS` and `ACCESS_FINE_LOCATION` so that seniors can dispatch instant SOS alerts with GPS coordinates to their family. Google Play Protect is cautious with any sideloaded APK containing SMS permissions outside the Play Store.
-- **Fix:** On the warning screen, tap **"More details"** and select **"Install anyway"**. Alternatively, temporarily toggle off **"Scan apps with Play Protect"** in the Google Play Store settings during the install, then re-enable it once BigTap is installed.
+### 5. Google Play Protect sideload prompt
+- **Reason:** BigTap uses `SEND_SMS` and `ACCESS_FINE_LOCATION` to dispatch instant SOS messages with GPS coordinates to family contacts. Play Protect prompts for confirmation when any app requesting SMS permissions is sideloaded directly outside the Play Store.
+- **Verification:** Do not disable Play Protect. Simply verify that the downloaded APK's SHA-256 checksum matches the official release hash published in this repository, then tap **"More details"** ➔ **"Install anyway"**.
 
 ---
 

@@ -8,7 +8,15 @@ export const NativeTorchController: React.FC = () => {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      setTorchNativeAsync(torchOn).catch(() => {});
+      setTorchNativeAsync(torchOn)
+        .then((success) => {
+          if (!success && torchOn) {
+            console.warn('Torch toggle returned false (hardware may be busy or unavailable)');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to set native torch state:', err);
+        });
     }
   }, [torchOn]);
 

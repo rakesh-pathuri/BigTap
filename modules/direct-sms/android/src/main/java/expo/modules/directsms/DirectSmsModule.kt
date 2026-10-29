@@ -117,22 +117,30 @@ class DirectSmsModule : Module() {
     }
 
     AsyncFunction("setTorchNative") { enabled: Boolean ->
-      val context = appContext.reactContext ?: return@AsyncFunction false
-      val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
-        ?: return@AsyncFunction false
+      setTorchInternal(enabled)
+    }
 
-      return@AsyncFunction try {
-        val cameraId = cameraManager.cameraIdList.firstOrNull { id ->
-          val characteristics = cameraManager.getCameraCharacteristics(id)
-          characteristics.get(android.hardware.camera2.CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
-        } ?: "0"
+    AsyncFunction("setTorchMode") { enabled: Boolean ->
+      setTorchInternal(enabled)
+    }
+  }
 
-        cameraManager.setTorchMode(cameraId, enabled)
-        true
-      } catch (e: Exception) {
-        android.util.Log.e("DirectSms", "setTorchNative failed: ${e.message}", e)
-        false
-      }
+  private fun setTorchInternal(enabled: Boolean): Boolean {
+    val context = appContext.reactContext ?: return false
+    val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as? CameraManager
+      ?: return false
+
+    return try {
+      val cameraId = cameraManager.cameraIdList.firstOrNull { id ->
+        val characteristics = cameraManager.getCameraCharacteristics(id)
+        characteristics.get(android.hardware.camera2.CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+      } ?: "0"
+
+      cameraManager.setTorchMode(cameraId, enabled)
+      true
+    } catch (e: Exception) {
+      android.util.Log.e("DirectSms", "setTorch failed: ${e.message}", e)
+      false
     }
   }
 }

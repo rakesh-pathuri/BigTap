@@ -32,13 +32,17 @@ export const sendDirectSmsAsync = async (
  * without opening the camera sensor, preventing Android from displaying the green camera dot.
  */
 export const setTorchNativeAsync = async (enabled: boolean): Promise<boolean> => {
-  if (DirectSmsNative?.setTorchMode) {
+  const torchFn = DirectSmsNative?.setTorchNative ?? DirectSmsNative?.setTorchMode;
+  if (torchFn) {
     try {
-      const success = await DirectSmsNative.setTorchMode(enabled);
+      const success = await torchFn.call(DirectSmsNative, enabled);
       return !!success;
     } catch (err) {
-      console.warn('Native setTorchMode error:', err);
+      console.error('Native torch error:', err);
+      return false;
     }
+  } else {
+    console.warn('DirectSmsNative torch method is unavailable');
   }
   return false;
 };

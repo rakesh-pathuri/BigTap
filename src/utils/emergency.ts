@@ -113,20 +113,41 @@ export interface EmergencyResult {
   error?: string;
 }
 
-export const dispatchEmergencyAlert = async (
-  recipientsInput: EmergencyRecipient[] | string,
-  baseMessage: string
-): Promise<EmergencyResult> => {
+export const resolveEmergencyRecipients = (
+  recipientsInput: EmergencyRecipient[] | string
+): EmergencyRecipient[] => {
   const rawList: EmergencyRecipient[] = Array.isArray(recipientsInput)
     ? recipientsInput.filter((r) => r && r.phoneNumber)
     : recipientsInput
     ? [{ name: 'Emergency Contact', phoneNumber: recipientsInput }]
     : [];
 
-  // Filter out placeholder demo numbers
-  const validRecipients = rawList.filter(
-    (r) => !isPlaceholderPhoneNumber(r.phoneNumber)
-  );
+  const seen = new Set<string>();
+  const valid: EmergencyRecipient[] = [];
+
+  for (const item of rawList) {
+    if (!item.phoneNumber || isPlaceholderPhoneNumber(item.phoneNumber)) {
+      continue;
+    }
+    const clean = normalizePhoneNumber(item.phoneNumber);
+    if (!clean || seen.has(clean)) {
+      continue;
+    }
+    seen.add(clean);
+    valid.push({
+      ...item,
+      phoneNumber: clean,
+    });
+  }
+
+  return valid;
+};
+
+export const dispatchEmergencyAlert = async (
+  recipientsInput: EmergencyRecipient[] | string,
+  baseMessage: string
+): Promise<EmergencyResult> => {
+  const validRecipients = resolveEmergencyRecipients(recipientsInput);
 
   if (validRecipients.length === 0) {
     return {
