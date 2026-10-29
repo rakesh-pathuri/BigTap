@@ -24,6 +24,13 @@
   </a>
 </p>
 
+> [!IMPORTANT]
+> **Note on Google Play Protect during installation:**  
+> Because BigTap uses sensitive hardware permissions (`SEND_SMS` and `ACCESS_FINE_LOCATION`) for its one-touch Emergency SOS feature, Google Play Protect may display a warning (*"Unsafe app blocked"* or *"Blocked by Play Protect"*) when sideloading the APK outside the Play Store.  
+> - **To continue:** Tap **"More details"** ➔ **"Install anyway"**.  
+> - **If blocked:** Temporarily pause Play Protect scanning during installation:  
+>   Open **Google Play Store** ➔ Tap your profile picture (top right) ➔ **Play Protect** ➔ Tap the **Settings gear icon** (top right) ➔ Toggle off **"Scan apps with Play Protect"** ➔ Install BigTap ➔ Turn Play Protect back on.
+
 ---
 
 ## Screenshots
@@ -224,6 +231,10 @@ BigTap requires only the permissions needed for safety and senior care:
   cd android
   ./gradlew clean
   ```
+
+### 5. Google Play Protect blocks installation
+- **Reason:** BigTap uses `SEND_SMS` and `ACCESS_FINE_LOCATION` so that seniors can dispatch instant SOS alerts with GPS coordinates to their family. Google Play Protect is cautious with any sideloaded APK containing SMS permissions outside the Play Store.
+- **Fix:** On the warning screen, tap **"More details"** and select **"Install anyway"**. Alternatively, temporarily toggle off **"Scan apps with Play Protect"** in the Google Play Store settings during the install, then re-enable it once BigTap is installed.
 
 ---
 
