@@ -35,6 +35,13 @@
   &nbsp;
   <img src="./docs/screenshots/settings.jpg" width="31%" alt="Caregiver Settings" />
 </p>
+<p align="center">
+  <img src="./docs/screenshots/7.jpg" width="31%" alt="Home Dark Theme" />
+  &nbsp;
+  <img src="./docs/screenshots/8.jpg" width="31%" alt="Wallpaper Picker" />
+  &nbsp;
+  <img src="./docs/screenshots/9.jpg" width="31%" alt="Caregiver Settings" />
+</p>
 
 ---
 
