@@ -6,7 +6,8 @@
 
 <p align="center">
   <b>A simple, distraction-free Android launcher designed for seniors and low-vision users.</b><br>
-  <i>Big targets, high contrast, zero clutter, and reliable emergency safety.</i>
+  <i>Big targets, high contrast, zero clutter, and reliable emergency safety.</i><br>
+  <sub>Built with care for my grandparents — and shared freely for yours, too.</sub>
 </p>
 
 <p align="center">
@@ -239,3 +240,10 @@ Please ensure `npx tsc --noEmit` and `npx expo lint` pass with zero errors befor
 This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
 You are free to use, modify, and distribute this software under the terms of the GNU General Public License as published by the Free Software Foundation. See the [LICENSE](LICENSE) file for the full license text.
+
+---
+
+<p align="center">
+  <b>Built with care for my grandparents — and shared freely for yours, too.</b><br>
+  <sub>If BigTap helps someone you love stay connected, confident, and safe, consider starring the repository or sharing it with other families.</sub>
+</p>
