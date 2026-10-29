@@ -18,6 +18,12 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6.svg" alt="TypeScript" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/rakesh-pathuri/BigTap/releases/latest">
+    <img src="https://img.shields.io/badge/Download_APK-v1.0.4-2ea44f?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  </a>
+</p>
+
 ---
 
 ## Screenshots
