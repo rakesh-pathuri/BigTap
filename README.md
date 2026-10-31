@@ -7,7 +7,7 @@
 <p align="center">
   <b>A simple, distraction-free Android launcher designed for seniors and low-vision users.</b><br>
   <i>Big targets, high contrast, zero clutter, and reliable emergency safety.</i><br>
-  <sub>Built with care for my grandparents — and shared freely for yours, too.</sub>
+  <sub>Built with care for my grandparents and shared freely for yours, too.</sub>
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 > [!NOTE]
 > **APK Sideloading & Security Verification:**  
 > When installing the APK directly outside the Play Store, Android shows a standard confirmation for sideloaded apps. If Google Play Protect displays a prompt, tap **"More details"** ➔ **"Install anyway"**.  
-> **Never disable Google Play Protect.** Instead, verify your download integrity against the official release checksum:  
+> Verify your download integrity against the official release checksum:  
 > ```text
 > SHA-256: e25bf98ceb3fcea934684dc0087a0b15d6dd2134ee10567dff5a5ca401804954
 > ```
@@ -269,6 +269,6 @@ You are free to use, modify, and distribute this software under the terms of the
 ---
 
 <p align="center">
-  <b>Built with care for my grandparents — and shared freely for yours, too.</b><br>
+  <b>Built with care for my grandparents and shared freely for yours, too.</b><br>
   <sub>If BigTap helps someone you love stay connected, confident, and safe, consider starring the repository or sharing it with other families.</sub>
 </p>
